@@ -168,29 +168,30 @@ class AcousticPlugin(plugins.BeetsPlugin):
                 if write:
                     item.try_write()
 
-    def _map_dict_to_scheme(self,
-                            d,
-                            s,
-                            composites=defaultdict(lambda: DefaultList('')),
-                            root=True):
-        for k, v in s.items():
-            if k in d:
+    def _map_dict_to_scheme(self, dictionary, scheme):
+        composites = defaultdict(lambda: DefaultList(''))
+        for yielded in self._dict_to_scheme_child(dictionary,
+                                                  scheme,
+                                                  composites):
+            yield yielded
+        for k, v in composites.items():
+            yield k, ' '.join(v)
+
+    def _dict_to_scheme_child(self, subdict, subscheme, composites):
+        for k, v in subscheme.items():
+            if k in subdict:
                 if type(v) == dict:
-                    for yielded in self._map_dict_to_scheme(d[k],
-                                                            v,
-                                                            composites,
-                                                            root=False):
+                    for yielded in self._dict_to_scheme_child(subdict[k],
+                                                              v,
+                                                              composites):
                         yield yielded
                 elif type(v) == tuple:
-                    composites.setdefault(v[0], DefaultList(''))[v[1]] = d[k]
+                    composites[v[0]][v[1]] = subdict[k]
                 else:
-                    yield (v, d[k])
+                    yield (v, subdict[k])
             else:
                 self._log.debug(u'Data {} could not be mapped to scheme {} '
-                                u'because key {} was not found', d, v, k)
-        if root:
-            for k, v in composites.items():
-                yield k, ' '.join(v)
+                                u'because key {} was not found', subdict, v, k)
 
 
 def _generate_urls(mbid):
