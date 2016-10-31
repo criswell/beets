@@ -203,6 +203,9 @@ def _generate_urls(mbid):
 
 
 class DefaultList(list):
+    """A list which extends itself with the default value provided to the
+    constructor when indexed further than its length.
+    """
     def __init__(self, default):
         self._default = default
 
