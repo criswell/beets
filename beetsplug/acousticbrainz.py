@@ -209,13 +209,12 @@ class DefaultList(list):
     def __init__(self, default):
         self._default = default
 
-    def _fill(self, index):
-            self.extend([self._default] * (index - len(self) + 1))
-
     def __setitem__(self, index, value):
-        self._fill(index)
-        list.__setitem__(self, index, value)
+        while len(self) < index:
+            self.append(self._default)
+        self.append(value)
 
     def __getitem__(self, index):
-        self._fill(index)
+        while len(self) <= index:
+            self.append(self._default)
         return list.__getitem__(self, index)
