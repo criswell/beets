@@ -154,7 +154,10 @@ class AcousticPlugin(plugins.BeetsPlugin):
     def _fetch_info(self, items, write):
         """Get data from AcousticBrainz for the items.
         """
-        for item in (item for item in items if item.mb_trackid):
+        for item in items:
+            if not item.mb_trackid:
+                continue
+
             self._log.info(u'getting data for: {}', item)
             data = self._get_data(item.mb_trackid)
             if data:
