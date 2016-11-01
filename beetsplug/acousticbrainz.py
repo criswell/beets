@@ -161,7 +161,7 @@ class AcousticPlugin(plugins.BeetsPlugin):
             self._log.info(u'getting data for: {}', item)
             data = self._get_data(item.mb_trackid)
             if data:
-                for attr, val in self._map_dict_to_scheme(data, ABSCHEME):
+                for attr, val in self._map_data_to_scheme(data, ABSCHEME):
                     self._log.info(u'attribute {} of {} set to {}',
                                    attr,
                                    item,
@@ -171,30 +171,30 @@ class AcousticPlugin(plugins.BeetsPlugin):
                 if write:
                     item.try_write()
 
-    def _map_dict_to_scheme(self, dictionary, scheme):
+    def _map_data_to_scheme(self, data, scheme):
         composites = defaultdict(lambda: DefaultList(''))
-        for yielded in self._dict_to_scheme_child(dictionary,
+        for yielded in self._data_to_scheme_child(data,
                                                   scheme,
                                                   composites):
             yield yielded
         for k, v in composites.items():
             yield k, ' '.join(v)
 
-    def _dict_to_scheme_child(self, subdict, subscheme, composites):
+    def _data_to_scheme_child(self, subdata, subscheme, composites):
         for k, v in subscheme.items():
-            if k in subdict:
+            if k in subdata:
                 if type(v) == dict:
-                    for yielded in self._dict_to_scheme_child(subdict[k],
+                    for yielded in self._data_to_scheme_child(subdata[k],
                                                               v,
                                                               composites):
                         yield yielded
                 elif type(v) == tuple:
-                    composites[v[0]][v[1]] = subdict[k]
+                    composites[v[0]][v[1]] = subdata[k]
                 else:
-                    yield (v, subdict[k])
+                    yield (v, subdata[k])
             else:
                 self._log.debug(u'Data {} could not be mapped to scheme {} '
-                                u'because key {} was not found', subdict, v, k)
+                                u'because key {} was not found', subdata, v, k)
 
 
 def _generate_urls(mbid):
