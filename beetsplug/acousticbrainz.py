@@ -235,15 +235,15 @@ class AcousticPlugin(plugins.BeetsPlugin):
         """
         composites = defaultdict(lambda: DefaultList(''))
         # The recursive traversal
-        for yielded in self._data_to_scheme_child(data,
-                                                  scheme,
-                                                  composites):
-            yield yielded
+        for attr, val in self._data_to_scheme_child(data,
+                                                    scheme,
+                                                    composites):
+            yield attr, val
         """When composites has been populated, yield the composite attributes
         by joining their parts.
         """
-        for k, v in composites.items():
-            yield k, ' '.join(v)
+        for composite_attr, value_parts in composites.items():
+            yield composite_attr, ' '.join(value_parts)
 
     def _data_to_scheme_child(self, subdata, subscheme, composites):
         """The recursive business logic of :meth:`_map_data_to_scheme`:
